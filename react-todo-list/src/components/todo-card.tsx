@@ -1,4 +1,6 @@
+import { twMerge } from "tailwind-merge";
 import { TodoItemType } from "../utils/types";
+import { useMemo } from "react";
 
 type PropTypes = {
   todoItem: TodoItemType;
@@ -9,8 +11,18 @@ type PropTypes = {
 export default function TodoItemCard(props: PropTypes) {
   const { todoItem, onMarkAsCompleteChange, onDelete } = props;
 
+  const isCompleted = useMemo(
+    () => todoItem.status === "completed",
+    [todoItem.status],
+  );
+
   return (
-    <div className="relative flex w-fit min-w-60 flex-col rounded-2xl bg-white p-4 shadow-2xl">
+    <div
+      className={twMerge(
+        "relative flex w-fit min-w-60 flex-col rounded-2xl bg-white p-4 shadow-2xl transition-colors duration-200",
+        isCompleted ? "bg-green-100" : "bg-red-100",
+      )}
+    >
       <button
         onClick={() => onDelete(todoItem.id)}
         className="absolute right-4 top-4 rounded-full p-2 text-red-600 hover:bg-red-600/10"
@@ -35,16 +47,25 @@ export default function TodoItemCard(props: PropTypes) {
         </svg>
       </button>
       <div>
-        <h2 className="mb-2 text-2xl font-medium">{todoItem.title}</h2>
-        <p className="font-light">{todoItem.description}</p>
+        <h2
+          className={twMerge(
+            "mb-2 text-2xl font-medium",
+            isCompleted && "line-through",
+          )}
+        >
+          {todoItem.title}
+        </h2>
+        <p className={twMerge("font-light", isCompleted && "line-through")}>
+          {todoItem.description}
+        </p>
       </div>
       <div className="mt-auto flex items-center justify-between">
-        <label htmlFor="checkbox">
+        <label htmlFor={"checkbox-" + todoItem.id}>
           Mark as {todoItem.status === "completed" ? "incomplete" : "complete"}
         </label>
         <input
-          className="h-6 w-6 accent-green-600 hover:accent-green-600/80"
-          id="checkbox"
+          className="h-6 w-6 rounded-lg accent-green-600"
+          id={"checkbox-" + todoItem.id}
           type="checkbox"
           checked={todoItem.status === "completed"}
           onChange={() => onMarkAsCompleteChange(todoItem.id)}
