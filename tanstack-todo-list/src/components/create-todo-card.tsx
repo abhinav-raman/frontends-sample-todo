@@ -10,7 +10,7 @@ export default function CreateTodoItemCard(props: Proptypes) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const todoInfo: TodoItemType = {
-      id: Math.random().toString(),
+      id: crypto.randomUUID(),
       title: form.get("title")?.toString() || "",
       description: form.get("description")?.toString() || "",
       status: "not-completed",

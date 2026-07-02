@@ -5,22 +5,28 @@ import CreateTodoItemCard from "../components/create-todo-card";
 import type { TodoItemType } from "../utils/types";
 import TodoItemCard from "../components/todo-card";
 
-export const Route = createFileRoute("/")({ component: Home });
+// The todo list lives in localStorage, which only exists in the browser, so
+// this route opts out of server rendering entirely. This also prevents the
+// create form from being visible (and natively submittable) before hydration.
+export const Route = createFileRoute("/")({ component: Home, ssr: false });
+
+function loadTodos(): Array<TodoItemType> {
+  if (typeof window === "undefined") {
+    return [];
+  }
+  try {
+    const stored: unknown = JSON.parse(localStorage.getItem("todos") ?? "[]");
+    return Array.isArray(stored) ? (stored as Array<TodoItemType>) : [];
+  } catch {
+    return [];
+  }
+}
 
 function Home() {
-  const [todos, setTodos] = useState<Array<TodoItemType>>([]);
+  const [todos, setTodos] = useState<Array<TodoItemType>>(loadTodos);
 
   useEffect(() => {
-    const userLocalTasks = localStorage.getItem("todos");
-    if (userLocalTasks) {
-      setTodos(JSON.parse(userLocalTasks) as TodoItemType[]);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (todos.length) {
-      localStorage.setItem("todos", JSON.stringify(todos));
-    }
+    localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
   function handleCreateTodo(data: TodoItemType) {
