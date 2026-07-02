@@ -1,0 +1,26 @@
+
+@import "tailwindcss";
+
+/* Tailwind v4's preflight no longer applies cursor: pointer to buttons; the
+   sibling apps use Tailwind v3, which does. Restore it for visual parity. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
